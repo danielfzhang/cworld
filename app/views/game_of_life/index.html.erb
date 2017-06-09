@@ -6,7 +6,7 @@
 <script>
 const speed=100,//ms
       lifeColor='LightSeaGreen',
-      mapColor='LightGrey';
+      mapColor='WhiteSmoke';
 var canvas,context,lives,cols,rows;
 var gamestarted=0,mouse=0;
 window.onload = init;
@@ -105,14 +105,14 @@ function draw(stepX, stepY, lineWidth, mapColor,lifeColor) {
   context.clearRect(0, 0, context.canvas.width, context.canvas.height);
   context.lineWidth = lineWidth;
   context.strokeStyle = mapColor;
-  for(var i = stepY; i < context.canvas.height; i += stepY){
+  for(var i = stepY+0.5; i < context.canvas.height; i += stepY){
       context.beginPath();
       context.moveTo(0, i);
       context.lineTo(context.canvas.width, i);
       context.stroke();
   }
 
-  for(var i = stepX; i < context.canvas.width; i += stepX){
+  for(var i = stepX+0.5; i < context.canvas.width; i += stepX){
       context.beginPath();
       context.moveTo(i, 0);
       context.lineTo(i, context.canvas.height);
@@ -123,7 +123,7 @@ function draw(stepX, stepY, lineWidth, mapColor,lifeColor) {
   for(var y=0;y<rows;y++){
       for(var x=0;x<cols;x++){
           if(lives[y*cols+x]==1){
-              context.fillRect(x*stepX,y*stepY,stepX-1,stepY-1);
+              context.fillRect(x*stepX+1,y*stepY+1,stepX-1,stepY-1);
           }
       }
   }

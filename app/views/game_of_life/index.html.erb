@@ -1,22 +1,22 @@
 <div id="lifediv" style='width:500px; margin:0 auto;margin-top:0.5%;'>
-<canvas id="lifemap" width="500" height="500" onmousemove="setlives(event)" onmousedown="mouseon()" onmouseup="mouseup()"><p>Your browser does not support the canvas element</p></canvas>
+<canvas id="lifemap" width="500" height="500" onmousemove="setlives(event)" onmousedown="mouseon(event)" onmouseup="mouseup()"><p>Your browser does not support the canvas element</p></canvas>
 <button type="button" class="btn btn-primary btn-lg btn-block" onclick="Start()">Start</button>
 </div>
 
 <script>
 const speed=100,//ms
       lifeColor='LightSeaGreen',
-      mapColor='SlateGray';
+      mapColor='LightGrey';
 var canvas,context,lives,cols,rows;
 var gamestarted=0,mouse=0;
 window.onload = init;
 
 function init(){
   canvas = document.getElementById("lifemap");
-  
+  canvas.style.cssText = "border:1px solid;border-radius:3px;color:SlateGray";
   if(screen.width<500){
     div = document.getElementById("lifediv");
-    div.style.cssText = "width:400px; margin:0 auto;margin-top:0.5%;"
+    div.style.cssText = "width:400px; margin:0 auto;margin-top:0.5%;";
     canvas.setAttribute("width", 400);
     canvas.setAttribute("height", 400);
   }
@@ -31,8 +31,9 @@ function init(){
   draw(10,10,1,mapColor,lifeColor);
 }
 
-function mouseon(){
+function mouseon(evt){
   mouse=1;
+  setlives(evt);
 }
 
 function mouseup(){
@@ -43,8 +44,12 @@ function setlives(evt){
   if(gamestarted==0 && mouse==1){
      function getMousePos(canvas, evt) {
         var rect = canvas.getBoundingClientRect();
+        var canvasX=Math.floor((evt.clientX - rect.left)/10);
+        if(canvasX>=cols){
+          canvasX=cols-1;
+        }
         return {
-            x: Math.floor((evt.clientX - rect.left)/10),
+            x: canvasX,
             y: Math.floor((evt.clientY - rect.top)/10)
           };
       }
@@ -100,14 +105,14 @@ function draw(stepX, stepY, lineWidth, mapColor,lifeColor) {
   context.clearRect(0, 0, context.canvas.width, context.canvas.height);
   context.lineWidth = lineWidth;
   context.strokeStyle = mapColor;
-  for(var i = 0; i <= context.canvas.height; i += stepY){
+  for(var i = stepY; i < context.canvas.height; i += stepY){
       context.beginPath();
       context.moveTo(0, i);
       context.lineTo(context.canvas.width, i);
       context.stroke();
   }
 
-  for(var i = 0; i <= context.canvas.width; i += stepX){
+  for(var i = stepX; i < context.canvas.width; i += stepX){
       context.beginPath();
       context.moveTo(i, 0);
       context.lineTo(i, context.canvas.height);

@@ -1,30 +1,66 @@
+<canvas id="lifemap" width="200" height="200"><p>Your browser does not support the canvas element</p></canvas>
 
-<canvas id="lifemap" width="800" height="800"></canvas>  
+<script>
+var lives,
+    canvas,
+    context;
+window.onload = init;
 
-<%= javascript_tag do %>
-window.onload = function(){  
-    canvas = document.getElementById("lifemap");  
-    context = canvas.getContext("2d");  
+function init(){
+  canvas = document.getElementById("lifemap");
+  context = canvas.getContext("2d");
   
-    function  drawGrid(stepX, stepY, lineWidth, color){  
-        context.save();  
-        context.lineWidth = lineWidth;  
-        context.strokeStyle = color;  
-        for(var i = 0; i <= context.canvas.height; i += stepY){  
-            context.beginPath();  
-            context.moveTo(0, i);  
-            context.lineTo(context.canvas.width, i);  
-            context.stroke();  
-        }  
+  lives=new Array(context.canvas.width * context.canvas.height);
+  for(var i=0;i<context.canvas.width * context.canvas.height;i++){
+      lives[i]=0;
+  }
+  lives[0]=1;
+  lives[1]=1;
+  lives[2]=1;
+  lives[context.canvas.width+2]=1;
+  lives[context.canvas.width]=1;
   
-        for(var i = 0; i <= context.canvas.width; i += stepX){  
-            context.beginPath();  
-            context.moveTo(i, 0);  
-            context.lineTo(i, context.canvas.height);  
-            context.stroke();  
-        }  
-        context.restore();  
-    }  
-    drawGrid(10, 10, 1, 'gray');  
-};  
-<% end %>
+  updatelife(10,10,1,'Gray','DarkCyan');
+  setInterval(updatelife, 500);
+}
+
+function updatelife() {
+  context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+  draw(10,10,1,'Gray','DarkCyan');
+  
+  var templive=new Array(lives.length);
+  for(var i = 0; i<lives.length; i += 1){
+      templive[i]=lives[i];
+  }
+  
+}
+  
+
+
+function draw(stepX, stepY, lineWidth, mapColor,lifeColor) {
+  context.lineWidth = lineWidth;
+  context.strokeStyle = mapColor;
+  for(var i = 0; i <= context.canvas.height; i += stepY){
+      context.beginPath();
+      context.moveTo(0, i);
+      context.lineTo(context.canvas.width, i);
+      context.stroke();
+  }
+
+  for(var i = 0; i <= context.canvas.width; i += stepX){
+      context.beginPath();
+      context.moveTo(i, 0);
+      context.lineTo(i, context.canvas.height);
+      context.stroke();
+  }
+  
+  context.fillStyle = lifeColor;
+  for(var y=0;y<context.canvas.height;y++){
+      for(var x=0;x<context.canvas.width;x++){
+          if(lives[y*context.canvas.width+x]==1){
+              context.fillRect(x*stepX,y*stepY,stepX-1,stepY-1);
+          }
+      }
+  }
+}
+</script>

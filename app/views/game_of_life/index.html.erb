@@ -1,4 +1,4 @@
-<div style='width:500px;margin:0 auto;margin-top:0.5%;'>
+<div id="lifediv" style='width:500px; margin:0 auto;margin-top:0.5%;'>
 <canvas id="lifemap" width="500" height="500"><p>Your browser does not support the canvas element</p></canvas>
 <button type="button" class="btn btn-primary btn-lg btn-block" onclick="Start()">Start</button>
 </div>
@@ -12,7 +12,15 @@ var gamestarted=0;
 window.onload = init;
 
 function init(){
-  canvas = document.getElementById("lifemap"),
+  canvas = document.getElementById("lifemap");
+  
+  if(screen.width<500){
+    div = document.getElementById("lifediv");
+    div.style.cssText = "width:400px; margin:0 auto;margin-top:0.5%;"
+    canvas.setAttribute("width", 400);
+    canvas.setAttribute("height", 400);
+  }
+  
   context = canvas.getContext("2d"),
   lives=new Array(context.canvas.width * context.canvas.height);
   for(var i=0;i<lives.length;i++){

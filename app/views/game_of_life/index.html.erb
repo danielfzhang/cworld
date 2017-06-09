@@ -1,5 +1,5 @@
 <div id="lifediv" style='width:500px; margin:0 auto;margin-top:0.5%;'>
-<canvas id="lifemap" width="500" height="500"><p>Your browser does not support the canvas element</p></canvas>
+<canvas id="lifemap" width="500" height="500" onmousemove="setlives(event)" onmousedown="mouseon()" onmouseup="mouseup()"><p>Your browser does not support the canvas element</p></canvas>
 <button type="button" class="btn btn-primary btn-lg btn-block" onclick="Start()">Start</button>
 </div>
 
@@ -8,7 +8,7 @@ const speed=100,//ms
       lifeColor='LightSeaGreen',
       mapColor='SlateGray';
 var canvas,context,lives,cols,rows;
-var gamestarted=0;
+var gamestarted=0,mouse=0;
 window.onload = init;
 
 function init(){
@@ -29,9 +29,19 @@ function init(){
       lives[i]=0;
   }
   draw(10,10,1,mapColor,lifeColor);
-  canvas.addEventListener("click", function (evt) {
-    if(gamestarted==0){
-      function getMousePos(canvas, evt) {
+}
+
+function mouseon(){
+  mouse=1;
+}
+
+function mouseup(){
+  mouse=0;
+}
+
+function setlives(evt){
+  if(gamestarted==0 && mouse==1){
+     function getMousePos(canvas, evt) {
         var rect = canvas.getBoundingClientRect();
         return {
             x: Math.floor((evt.clientX - rect.left)/10),
@@ -41,8 +51,7 @@ function init(){
       var mousePos = getMousePos(canvas, evt);
       lives[mousePos.y*cols+mousePos.x]=1;
       draw(10,10,1,mapColor,lifeColor);
-    }
-  }, false);
+  }
 }
 
 function Start()

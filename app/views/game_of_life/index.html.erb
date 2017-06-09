@@ -7,7 +7,7 @@
 const speed=100,//ms
       lifeColor='LightSeaGreen',
       mapColor='SlateGray';
-var canvas,context,lives;
+var canvas,context,lives,cols,rows;
 var gamestarted=0;
 window.onload = init;
 
@@ -22,7 +22,9 @@ function init(){
   }
   
   context = canvas.getContext("2d"),
-  lives=new Array(context.canvas.width * context.canvas.height);
+  rows=context.canvas.height/10;
+  cols=context.canvas.width/10;
+  lives=new Array(rows * cols);
   for(var i=0;i<lives.length;i++){
       lives[i]=0;
   }
@@ -37,7 +39,7 @@ function init(){
           };
       }
       var mousePos = getMousePos(canvas, evt);
-      lives[mousePos.y*context.canvas.width+mousePos.x]=1;
+      lives[mousePos.y*cols+mousePos.x]=1;
       draw(10,10,1,mapColor,lifeColor);
     }
   }, false);
@@ -58,8 +60,7 @@ function gameoflife(){
 }
 
 function updatelife() {
-  var rows=context.canvas.height;
-  var cols=context.canvas.width;
+  
   
   draw(10,10,1,mapColor,lifeColor);
 
@@ -105,9 +106,9 @@ function draw(stepX, stepY, lineWidth, mapColor,lifeColor) {
   }
 
   context.fillStyle = lifeColor;
-  for(var y=0;y<context.canvas.height;y++){
-      for(var x=0;x<context.canvas.width;x++){
-          if(lives[y*context.canvas.width+x]==1){
+  for(var y=0;y<rows;y++){
+      for(var x=0;x<cols;x++){
+          if(lives[y*cols+x]==1){
               context.fillRect(x*stepX,y*stepY,stepX-1,stepY-1);
           }
       }

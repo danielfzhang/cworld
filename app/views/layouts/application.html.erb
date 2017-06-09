@@ -9,6 +9,20 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
   </head>
   <body>
+    <div class="pos-f-t">
+    <div class="collapse" id="navbarToggleExternalContent">
+      <div class="bg-inverse p-4">
+        <h4 class="text-white">Game of Life</h4>
+        <span class="text-muted">The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970</span>
+      </div>
+    </div>
+    <nav class="navbar navbar-inverse bg-inverse">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </nav>
+    </div>
+    
     <%= yield %>
 
     <!-- jQuery first, then Tether, then Bootstrap JS. -->

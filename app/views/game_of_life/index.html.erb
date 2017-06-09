@@ -1,43 +1,85 @@
-<canvas id="lifemap" width="200" height="200"><p>Your browser does not support the canvas element</p></canvas>
+<div style='width:500px;margin:0 auto;margin-top:0.5%;'>
+<canvas id="lifemap" width="500" height="500"><p>Your browser does not support the canvas element</p></canvas>
+<button type="button" class="btn btn-primary btn-lg btn-block" onclick="Start()">Start</button>
+</div>
 
 <script>
-var lives,
-    canvas,
-    context;
+const speed=200,//ms
+      lifeColor='LightSeaGreen',
+      mapColor='SlateGray';
+var canvas,context,lives;
+var gamestarted=0;
 window.onload = init;
 
 function init(){
-  canvas = document.getElementById("lifemap");
-  context = canvas.getContext("2d");
-  
+  canvas = document.getElementById("lifemap"),
+  context = canvas.getContext("2d"),
   lives=new Array(context.canvas.width * context.canvas.height);
-  for(var i=0;i<context.canvas.width * context.canvas.height;i++){
+  for(var i=0;i<lives.length;i++){
       lives[i]=0;
   }
-  lives[0]=1;
-  lives[1]=1;
-  lives[2]=1;
-  lives[context.canvas.width+2]=1;
-  lives[context.canvas.width]=1;
-  
-  updatelife(10,10,1,'Gray','DarkCyan');
-  setInterval(updatelife, 500);
+  draw(10,10,1,mapColor,lifeColor);
+  canvas.addEventListener("click", function (evt) {
+    if(gamestarted==0){
+      function getMousePos(canvas, evt) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+            x: Math.floor((evt.clientX - rect.left)/10),
+            y: Math.floor((evt.clientY - rect.top)/10)
+          };
+      }
+      var mousePos = getMousePos(canvas, evt);
+      lives[mousePos.y*context.canvas.width+mousePos.x]=1;
+      draw(10,10,1,mapColor,lifeColor);
+    }
+  }, false);
+}
+
+function Start()
+{
+  if(gamestarted==0){
+    gamestarted=1;
+    gameoflife();
+  }
+}
+
+
+function gameoflife(){
+  updatelife(10,10,1,mapColor,lifeColor);
+  setInterval(updatelife, speed);
 }
 
 function updatelife() {
-  context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-  draw(10,10,1,'Gray','DarkCyan');
+  var rows=context.canvas.height;
+  var cols=context.canvas.width;
   
+  draw(10,10,1,mapColor,lifeColor);
+
   var templive=new Array(lives.length);
   for(var i = 0; i<lives.length; i += 1){
       templive[i]=lives[i];
   }
-  
-}
-  
 
+  for(var y2=0;y2<rows;y2+=1){
+      for(var x2=0;x2<cols;x2+=1){
+        var lifeCount=0;
+        if(y2-1>=0&&x2-1>=0 && templive[(y2-1)*cols+x2-1]>0)lifeCount++;
+        if(y2-1>=0 && templive[(y2-1)*cols+x2]>0)lifeCount++;
+        if(y2-1>=0&&x2+1<cols && templive[(y2-1)*cols+x2+1]>0)lifeCount++;
+        if(x2+1<cols&&templive[y2*cols+x2+1]>0)lifeCount++;
+        if(y2+1<rows&&x2+1<cols&&templive[(y2+1)*cols+x2+1]>0)lifeCount++;
+        if(y2+1<rows&&templive[(y2+1)*cols+x2]>0)lifeCount++;
+        if(y2+1<rows&&x2-1>=0&&templive[(y2+1)*cols+x2-1]>0)lifeCount++;
+        if(x2-1>=0&&templive[y2*cols+x2-1]>0)lifeCount++;
+
+        if((lifeCount<2||lifeCount>3)&&templive[y2*cols+x2]>0)lives[y2*cols+x2]=0;
+        if(lifeCount==3&&templive[y2*cols+x2]==0)lives[y2*cols+x2]=1;
+        }
+  }
+}
 
 function draw(stepX, stepY, lineWidth, mapColor,lifeColor) {
+  context.clearRect(0, 0, context.canvas.width, context.canvas.height);
   context.lineWidth = lineWidth;
   context.strokeStyle = mapColor;
   for(var i = 0; i <= context.canvas.height; i += stepY){
@@ -53,7 +95,7 @@ function draw(stepX, stepY, lineWidth, mapColor,lifeColor) {
       context.lineTo(i, context.canvas.height);
       context.stroke();
   }
-  
+
   context.fillStyle = lifeColor;
   for(var y=0;y<context.canvas.height;y++){
       for(var x=0;x<context.canvas.width;x++){

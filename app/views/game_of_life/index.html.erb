@@ -1,0 +1,30 @@
+
+<canvas id="lifemap" width="800" height="800"></canvas>  
+
+<%= javascript_tag do %>
+window.onload = function(){  
+    canvas = document.getElementById("lifemap");  
+    context = canvas.getContext("2d");  
+  
+    function  drawGrid(stepX, stepY, lineWidth, color){  
+        context.save();  
+        context.lineWidth = lineWidth;  
+        context.strokeStyle = color;  
+        for(var i = 0; i <= context.canvas.height; i += stepY){  
+            context.beginPath();  
+            context.moveTo(0, i);  
+            context.lineTo(context.canvas.width, i);  
+            context.stroke();  
+        }  
+  
+        for(var i = 0; i <= context.canvas.width; i += stepX){  
+            context.beginPath();  
+            context.moveTo(i, 0);  
+            context.lineTo(i, context.canvas.height);  
+            context.stroke();  
+        }  
+        context.restore();  
+    }  
+    drawGrid(10, 10, 1, 'gray');  
+};  
+<% end %>

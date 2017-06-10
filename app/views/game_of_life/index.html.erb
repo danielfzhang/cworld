@@ -1,34 +1,36 @@
-<div id="lifediv" style='width:500px; margin:0 auto;margin-top:0.5%;'>
-<canvas id="lifemap" width="500" height="500" onmousemove="setlives(event)" onmousedown="mouseon(event)" onmouseup="mouseup()"><p>Your browser does not support the canvas element</p></canvas>
-<button type="button" class="btn btn-primary btn-lg btn-block" onclick="Start()">Start</button>
+<body onmouseup="mouseup()">
+<div id="lifeDiv" style='width:600px; margin:0 auto;margin-top:0.5%;'>
+  <canvas id="lifeGrid" width="600" height="600" onmousemove="setlives(event)" onmousedown="mouseon(event)">
+    <p>Your browser does not support the canvas element</p>
+  </canvas>
+  <button type="button" class="btn btn-primary btn-lg btn-block" onclick="Start()">Start</button>
 </div>
-
+</body>
 <script>
-const speed=100,//ms
+const speed=70,//ms
+      size=5,//size of pixel
       lifeColor='LightSeaGreen',
       mapColor='WhiteSmoke';
 var canvas,context,lives,cols,rows;
-var gamestarted=0,mouse=0;
+var gamestarted=0,mouse=0;//flag
 window.onload = init;
 
 function init(){
-  canvas = document.getElementById("lifemap");
+  canvas = document.getElementById("lifeGrid");
   canvas.style.cssText = "border:1px solid;border-radius:3px;color:SlateGray";
   if(screen.width<500){
-    div = document.getElementById("lifediv");
+    div = document.getElementById("lifeDiv");
     div.style.cssText = "width:400px; margin:0 auto;margin-top:0.5%;";
     canvas.setAttribute("width", 400);
     canvas.setAttribute("height", 400);
   }
-  
   context = canvas.getContext("2d"),
-  rows=context.canvas.height/10;
-  cols=context.canvas.width/10;
+  rows=context.canvas.height/size;
+  cols=context.canvas.width/size;
   lives=new Array(rows * cols);
-  for(var i=0;i<lives.length;i++){
-      lives[i]=0;
-  }
-  draw(10,10,1,mapColor,lifeColor);
+  for(var i=0;i<lives.length;i++)
+    lives[i]=0;
+  draw(1,mapColor,lifeColor);
 }
 
 function mouseon(evt){
@@ -44,18 +46,16 @@ function setlives(evt){
   if(gamestarted==0 && mouse==1){
      function getMousePos(canvas, evt) {
         var rect = canvas.getBoundingClientRect();
-        var canvasX=Math.floor((evt.clientX - rect.left)/10);
-        if(canvasX>=cols){
-          canvasX=cols-1;
-        }
+        var canvasX=Math.floor((evt.clientX - rect.left)/size);
+        if(canvasX>=cols) canvasX=cols-1;
         return {
             x: canvasX,
-            y: Math.floor((evt.clientY - rect.top)/10)
+            y: Math.floor((evt.clientY - rect.top)/size)
           };
       }
       var mousePos = getMousePos(canvas, evt);
       lives[mousePos.y*cols+mousePos.x]=1;
-      draw(10,10,1,mapColor,lifeColor);
+      draw(1,mapColor,lifeColor);
   }
 }
 
@@ -69,19 +69,17 @@ function Start()
 
 
 function gameoflife(){
-  updatelife(10,10,1,mapColor,lifeColor);
+  updatelife(size,size,1,mapColor,lifeColor);
   setInterval(updatelife, speed);
 }
 
 function updatelife() {
-  
-  
-  draw(10,10,1,mapColor,lifeColor);
+  draw(1,mapColor,lifeColor);
 
   var templive=new Array(lives.length);
-  for(var i = 0; i<lives.length; i += 1){
-      templive[i]=lives[i];
-  }
+  for(var i = 0; i<lives.length; i += 1)
+    templive[i]=lives[i];
+
 
   for(var y2=0;y2<rows;y2+=1){
       for(var x2=0;x2<cols;x2+=1){
@@ -101,18 +99,18 @@ function updatelife() {
   }
 }
 
-function draw(stepX, stepY, lineWidth, mapColor,lifeColor) {
+function draw(lineWidth, mapColor,lifeColor) {
   context.clearRect(0, 0, context.canvas.width, context.canvas.height);
   context.lineWidth = lineWidth;
   context.strokeStyle = mapColor;
-  for(var i = stepY+0.5; i < context.canvas.height; i += stepY){
+  for(var i = size+0.5; i < context.canvas.height; i += size){
       context.beginPath();
       context.moveTo(0, i);
       context.lineTo(context.canvas.width, i);
       context.stroke();
   }
 
-  for(var i = stepX+0.5; i < context.canvas.width; i += stepX){
+  for(var i = size+0.5; i < context.canvas.width; i += size){
       context.beginPath();
       context.moveTo(i, 0);
       context.lineTo(i, context.canvas.height);
@@ -123,7 +121,7 @@ function draw(stepX, stepY, lineWidth, mapColor,lifeColor) {
   for(var y=0;y<rows;y++){
       for(var x=0;x<cols;x++){
           if(lives[y*cols+x]==1){
-              context.fillRect(x*stepX+1,y*stepY+1,stepX-1,stepY-1);
+              context.fillRect(x*size+1,y*size+1,size-1,size-1);
           }
       }
   }

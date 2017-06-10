@@ -4,13 +4,13 @@
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
-  <strong>The World Perish!!! </strong>  No new life, or life falls into a endless loop.
+  <strong>The World Perish!!! </strong>  No new life, or a endless loop.
 </div>
  
 <div class="card" id="lifeDiv" style='width:700px; margin:0 auto;margin-top:2px;'>
   <div class="card-header" id="lifeinfo"></div>
   <canvas id="lifeGrid" onmousemove="setlives(event)" onmousedown="mouseon(event)" style='border:1px solid;border-radius:2px;color:Black;'><p>Your browser does not support the canvas element</p></canvas>
-  <button type="button" class="btn btn-primary btn-lg btn-block" onclick="Start()" >START</button>
+  <button id="start" type="button" class="btn btn-primary btn-lg btn-block" onclick="Start()" >START</button>
 </div>
 
 </body>
@@ -154,7 +154,10 @@ function draw(lineWidth, mapColor,lifeColor) {
       }
   }
   document.getElementById("lifeinfo").innerHTML="Alive: "+alive+"&emsp;&emsp;Generation: "+gene;
-  if(lastgene50==0)
+  if(lastgene50==0){
     clearInterval(timelp);
+     document.getElementById("start").innerHTML="RESTART";
+     document.getElementById("start").onclick=function(){window.location.reload();}
+  }
 }
 </script>

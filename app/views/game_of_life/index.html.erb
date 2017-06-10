@@ -1,9 +1,18 @@
 <body onmouseup="mouseup()" onselectstart="return false;">
+
+<div class="alert alert-info" id="gameover"role="alert" style="display:none;margin-top:2px;">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <strong>The World Perish!!! </strong>  No new life, or life falls into a endless loop.
+</div>
+ 
 <div class="card" id="lifeDiv" style='width:700px; margin:0 auto;margin-top:2px;'>
   <div class="card-header" id="lifeinfo"></div>
   <canvas id="lifeGrid" onmousemove="setlives(event)" onmousedown="mouseon(event)" style='border:1px solid;border-radius:2px;color:Black;'><p>Your browser does not support the canvas element</p></canvas>
   <button type="button" class="btn btn-primary btn-lg btn-block" onclick="Start()" >START</button>
 </div>
+
 </body>
 
 <script>
@@ -11,7 +20,7 @@ const speed=50,//ms
       lifesize=5,//lifesize of pixel
       lifeColor='LightSeaGreen',
       mapColor='WhiteSmoke';
-var canvas,context,lives,cols,rows,div;
+var canvas,context,lives,lives2nd,cols,rows,div;
 var gamestarted=0,mouse=0,gene=0;//flag
 window.onload = init;
 
@@ -31,8 +40,11 @@ function init(){
   rows=context.canvas.height/lifesize;
   cols=context.canvas.width/lifesize;
   lives=new Array(rows * cols);
-  for(var i=0;i<lives.length;i++)
+  lives2nd=new Array(rows * cols);
+  for(var i=0;i<lives.length;i++){
     lives[i]=0;
+    lives2nd[i]=1;
+  }
   draw(1,mapColor,lifeColor);
 }
 
@@ -73,17 +85,16 @@ function Start()
 
 function gameoflife(){
   updatelife(lifesize,lifesize,1,mapColor,lifeColor);
-  setInterval(updatelife, speed);
+  timelp=setInterval(updatelife, speed);
 }
 
 function updatelife() {
   draw(1,mapColor,lifeColor);
+  
   gene+=1;
   var templive=new Array(lives.length);
   for(var i = 0; i<lives.length; i += 1)
     templive[i]=lives[i];
-
-
   for(var y2=0;y2<rows;y2+=1){
       for(var x2=0;x2<cols;x2+=1){
         var lifeCount=0;
@@ -100,6 +111,21 @@ function updatelife() {
         if(lifeCount==3&&templive[y2*cols+x2]==0)lives[y2*cols+x2]=1;
         }
   }
+  
+  
+  var diffgene=0;
+  for(var i = 0; i<lives.length; i += 1)
+    if(lives2nd[i]!=lives[i])
+      diffgene+=1;
+  if(diffgene==0){
+    clearInterval(timelp);
+    $("#gameover").show();
+  }else{
+    for(var i = 0; i<lives.length; i += 1)
+      lives2nd[i]=templive[i];
+  }
+  
+   
 }
 
 function draw(lineWidth, mapColor,lifeColor) {

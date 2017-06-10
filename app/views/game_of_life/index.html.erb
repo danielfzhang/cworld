@@ -1,4 +1,4 @@
-<body onmouseup="mouseup()" onselectstart="return false;">
+<body onmouseup="mouseup()" onselectstart="return false">
 
 <div class="alert alert-info" id="gameover"role="alert" style="display:none;margin-top:2px;">
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -10,7 +10,9 @@
 <div class="card" id="lifeDiv" style='width:700px; margin:0 auto;margin-top:2px;'>
   <div class="card-header" id="lifeinfo"></div>
   <canvas id="lifeGrid" onmousemove="setlives(event)" onmousedown="mouseon(event)" style='border:1px solid;border-radius:2px;color:Black;'><p>Your browser does not support the canvas element</p></canvas>
-  <button id="start" type="button" class="btn btn-primary btn-lg btn-block" onclick="Start()" >START</button>
+  <button type="button" class="btn btn-secondary btn-lg btn-block" onclick="random()">Random</button>
+  <input id="ex1" style='width:700px;' data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="1" data-slider-step="0.01" data-slider-value="0"/>
+  <button id="start" type="button" class="btn btn-info btn-lg btn-block" onclick="Start()">START</button>
 </div>
 
 </body>
@@ -21,10 +23,18 @@ const speed=50,//ms
       lifeColor='LightSeaGreen',
       mapColor='WhiteSmoke';
 var canvas,context,lives,lives2nd,cols,rows,div;
-var gamestarted=0,mouse=0,gene=0,lastgene50=-1;//flag
+var gamestarted=0,mouse=0,gene=0,lastgene50=-1, soup=0;//flag
+var slider;
 window.onload = init;
 
 function init(){
+  
+  slider = new Slider('#ex1');
+  
+  slider.on("slide", function() {
+  	document.getElementById("lifeinfo").innerHTML="Random density: "+slider.getValue();
+  });
+  
   canvas = document.getElementById("lifeGrid");
   div = document.getElementById("lifeDiv");
   
@@ -45,7 +55,26 @@ function init(){
     lives[i]=0;
     lives2nd[i]=1;
   }
-  draw(1,mapColor,lifeColor);
+  draw();
+}
+
+function random(){
+  if(gamestarted==0){
+    soup=slider.getValue();
+    lives=new Array(rows * cols);
+    lives2nd=new Array(rows * cols);
+    for(var i=0;i<lives.length;i++){
+      if(Math.random()<soup){
+        lives[i]=1;
+        lives2nd[i]=0;
+      }else{
+        lives[i]=0;
+        lives2nd[i]=1;
+      }
+      
+    }
+    draw();
+  }
 }
 
 function mouseon(evt){
@@ -70,7 +99,7 @@ function setlives(evt){
       }
       var mousePos = getMousePos(canvas, evt);
       lives[mousePos.y*cols+mousePos.x]=1;
-      draw(1,mapColor,lifeColor);
+      draw();
   }
 }
 
@@ -79,6 +108,7 @@ function Start()
   if(gamestarted==0){
     gamestarted=1;
     gameoflife();
+    slider.disable();
   }
 }
 
@@ -88,7 +118,7 @@ function gameoflife(){
 }
 
 function updatelife(){
-  draw(1,mapColor,lifeColor);
+  draw();
   
   gene+=1;
   var templive=new Array(lives.length);
@@ -125,10 +155,11 @@ function updatelife(){
     lastgene50-=1;
 }
 
-function draw(lineWidth, mapColor,lifeColor) {
+function draw() {
   var alive=0;
+  soup=slider.getValue();
   context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-  context.lineWidth = lineWidth;
+  context.lineWidth = 1;
   context.strokeStyle = mapColor;
   for(var i = lifesize+0.5; i < context.canvas.height; i += lifesize){
       context.beginPath();
@@ -153,7 +184,7 @@ function draw(lineWidth, mapColor,lifeColor) {
           }
       }
   }
-  document.getElementById("lifeinfo").innerHTML="Alive: "+alive+"&emsp;&emsp;Generation: "+gene;
+  document.getElementById("lifeinfo").innerHTML="Alive: "+alive+"&emsp;&emsp;Generation: "+gene+"&emsp; Random density: "+soup;
   if(lastgene50==0){
     clearInterval(timelp);
      document.getElementById("start").innerHTML="RESTART";

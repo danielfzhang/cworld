@@ -11,8 +11,9 @@
   <div class="card-header" id="lifeinfo"></div>
   <canvas id="lifeGrid" onmousemove="setlives(event)" onmousedown="mouseon(event)" style='border:1px solid;border-radius:2px;color:Black;'><p>Your browser does not support the canvas element</p></canvas>
   <button type="button" class="btn btn-secondary btn-lg btn-block" onclick="random()">Random</button>
-  <input id="ex1" style='width:700px;' data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="1" data-slider-step="0.01" data-slider-value="0"/>
+  <input id="ex1" style='width:400px;' data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="1" data-slider-step="0.01" data-slider-value="0"/>
   <button id="start" type="button" class="btn btn-info btn-lg btn-block" onclick="Start()">START</button>
+  
 </div>
 
 </body>
@@ -32,8 +33,8 @@ function init(){
   slider = new Slider('#ex1');
   
   slider.on("slide", function() {
-  	document.getElementById("lifeinfo").innerHTML="Random density: "+slider.getValue();
-  });
+	document.getElementById("lifeinfo").innerHTML=slider.getValue();
+});
   
   canvas = document.getElementById("lifeGrid");
   div = document.getElementById("lifeDiv");
@@ -42,7 +43,6 @@ function init(){
     div.style.cssText = "width:400px; margin:0 auto;margin-top:1px;";
     canvas.setAttribute("width", 400);
     canvas.setAttribute("height", 400);
-    slider.setAttribute("width", 400);
   } else{
     canvas.setAttribute("width", div.style.width);
     canvas.setAttribute("height", div.style.width);
@@ -185,7 +185,7 @@ function draw() {
           }
       }
   }
-  document.getElementById("lifeinfo").innerHTML="Alive: "+alive+"&emsp;&emsp;Generation: "+gene+"&emsp; Random density: "+soup;
+  document.getElementById("lifeinfo").innerHTML="Alive: "+alive+"&emsp;&emsp;Generation: "+gene+"&emsp; Random density:"+soup;
   if(lastgene50==0){
     clearInterval(timelp);
      document.getElementById("start").innerHTML="RESTART";

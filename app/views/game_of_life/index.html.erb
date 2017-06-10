@@ -1,32 +1,35 @@
-<body onmouseup="mouseup()">
-<div id="lifeDiv" style='width:600px; margin:0 auto;margin-top:0.5%;'>
-  <canvas id="lifeGrid" width="600" height="600" onmousemove="setlives(event)" onmousedown="mouseon(event)">
-    <p>Your browser does not support the canvas element</p>
-  </canvas>
-  <button type="button" class="btn btn-primary btn-lg btn-block" onclick="Start()">Start</button>
+<body onmouseup="mouseup()" onselectstart="return false;">
+<div class="card" id="lifeDiv" style='width:800px; margin:0 auto;margin-top:2px;'>
+  <div class="card-header" id="lifeinfo"></div>
+  <canvas id="lifeGrid" onmousemove="setlives(event)" onmousedown="mouseon(event)" style='border:1px solid;border-radius:2px;color:Black;'><p>Your browser does not support the canvas element</p></canvas>
+  <button type="button" class="btn btn-primary btn-lg btn-block" onclick="Start()" >START</button>
 </div>
 </body>
+
 <script>
-const speed=70,//ms
-      size=5,//size of pixel
+const speed=50,//ms
+      lifesize=5,//lifesize of pixel
       lifeColor='LightSeaGreen',
       mapColor='WhiteSmoke';
-var canvas,context,lives,cols,rows;
-var gamestarted=0,mouse=0;//flag
+var canvas,context,lives,cols,rows,div;
+var gamestarted=0,mouse=0,gene=0;//flag
 window.onload = init;
 
 function init(){
   canvas = document.getElementById("lifeGrid");
-  canvas.style.cssText = "border:1px solid;border-radius:3px;color:SlateGray";
+  div = document.getElementById("lifeDiv");
+  
   if(screen.width<500){
-    div = document.getElementById("lifeDiv");
-    div.style.cssText = "width:400px; margin:0 auto;margin-top:0.5%;";
+    div.style.cssText = "width:400px; margin:0 auto;margin-top:1px;";
     canvas.setAttribute("width", 400);
     canvas.setAttribute("height", 400);
+  } else{
+    canvas.setAttribute("width", div.style.width);
+    canvas.setAttribute("height", div.style.width);
   }
-  context = canvas.getContext("2d"),
-  rows=context.canvas.height/size;
-  cols=context.canvas.width/size;
+  context = canvas.getContext("2d");
+  rows=context.canvas.height/lifesize;
+  cols=context.canvas.width/lifesize;
   lives=new Array(rows * cols);
   for(var i=0;i<lives.length;i++)
     lives[i]=0;
@@ -46,11 +49,11 @@ function setlives(evt){
   if(gamestarted==0 && mouse==1){
      function getMousePos(canvas, evt) {
         var rect = canvas.getBoundingClientRect();
-        var canvasX=Math.floor((evt.clientX - rect.left)/size);
+        var canvasX=Math.floor((evt.clientX - rect.left)/lifesize);
         if(canvasX>=cols) canvasX=cols-1;
         return {
             x: canvasX,
-            y: Math.floor((evt.clientY - rect.top)/size)
+            y: Math.floor((evt.clientY - rect.top)/lifesize)
           };
       }
       var mousePos = getMousePos(canvas, evt);
@@ -69,13 +72,13 @@ function Start()
 
 
 function gameoflife(){
-  updatelife(size,size,1,mapColor,lifeColor);
+  updatelife(lifesize,lifesize,1,mapColor,lifeColor);
   setInterval(updatelife, speed);
 }
 
 function updatelife() {
   draw(1,mapColor,lifeColor);
-
+  gene+=1;
   var templive=new Array(lives.length);
   for(var i = 0; i<lives.length; i += 1)
     templive[i]=lives[i];
@@ -100,17 +103,18 @@ function updatelife() {
 }
 
 function draw(lineWidth, mapColor,lifeColor) {
+  var alive=0;
   context.clearRect(0, 0, context.canvas.width, context.canvas.height);
   context.lineWidth = lineWidth;
   context.strokeStyle = mapColor;
-  for(var i = size+0.5; i < context.canvas.height; i += size){
+  for(var i = lifesize+0.5; i < context.canvas.height; i += lifesize){
       context.beginPath();
       context.moveTo(0, i);
       context.lineTo(context.canvas.width, i);
       context.stroke();
   }
 
-  for(var i = size+0.5; i < context.canvas.width; i += size){
+  for(var i = lifesize+0.5; i < context.canvas.width; i += lifesize){
       context.beginPath();
       context.moveTo(i, 0);
       context.lineTo(i, context.canvas.height);
@@ -121,9 +125,11 @@ function draw(lineWidth, mapColor,lifeColor) {
   for(var y=0;y<rows;y++){
       for(var x=0;x<cols;x++){
           if(lives[y*cols+x]==1){
-              context.fillRect(x*size+1,y*size+1,size-1,size-1);
+              alive+=1;
+              context.fillRect(x*lifesize+1,y*lifesize+1,lifesize-1,lifesize-1);
           }
       }
   }
+  document.getElementById("lifeinfo").innerHTML="Alive: "+alive+"&emsp;&emsp;Generation: "+gene;
 }
 </script>

@@ -1,20 +1,24 @@
 <body onmouseup="mouseup()" onselectstart="return false">
 
-<div class="alert alert-info" id="gameover"role="alert" style="display:none;margin-top:2px;">
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-  <strong>The World Perish!!! </strong>  No new life, or a endless loop.
-</div>
- 
-<div class="card" id="lifeDiv" style='width:700px; margin:0 auto;margin-top:2px;'>
-  <div class="card-header" id="lifeinfo"></div>
-  <canvas id="lifeGrid" onmousemove="setlives(event)" onmousedown="mouseon(event)" style='border:1px solid;border-radius:2px;color:Black;'><p>Your browser does not support the canvas element</p></canvas>
-  <button type="button" class="btn btn-secondary btn-lg btn-block" onclick="random()">Random</button>
-  <input id="ex1" style='width:400px;' data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="1" data-slider-step="0.01" data-slider-value="0"/>
-  <button id="start" type="button" class="btn btn-info btn-lg btn-block" onclick="Start()">START</button>
-  
-</div>
+  <div class="alert alert-info" id="gameover"role="alert" style="display:none;margin-top:2px;">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <strong>The World Perish!!! </strong>  No new life, or a endless loop.
+  </div>
+
+  <div class="card" id="lifeDiv" style='width:700px; margin:0 auto;margin-top:2px;'>
+    <div class="card-header" id="lifeinfo">Alive: 0&emsp;&emsp;Generation: 0</div>
+    <canvas id="lifeGrid" onmousemove="setlives(event)" onmousedown="mouseon(event)" style='border:1px solid;border-radius:2px;color:Black;'><p>Your browser does not support the canvas element</p></canvas>
+    
+    <div id="randomdiv"class="btn-group" role="group" aria-label="Basic example" style='width: 100%'>
+    <button type="button" class="btn btn-outline-secondary" onclick="minus5()">-0.05</button>
+    <button id="random" type="button" class="btn btn-outline-info" onclick="random()"style='width: 100%'>Random Soup 0%</button>
+    <button type="button" class="btn btn-outline-secondary" onclick="plus5()">+0.05</button>
+    </div>
+   
+    <button id="start" type="button" class="btn btn-info btn-lg btn-block" onclick="Start()">START</button>
+  </div>
 
 </body>
 
@@ -30,19 +34,14 @@ window.onload = init;
 
 function init(){
   
-  slider = new Slider('#ex1');
-  
-  slider.on("slide", function() {
-	document.getElementById("lifeinfo").innerHTML=slider.getValue();
-});
-  
   canvas = document.getElementById("lifeGrid");
   div = document.getElementById("lifeDiv");
-  
+
   if(screen.width<500){
     div.style.cssText = "width:400px; margin:0 auto;margin-top:1px;";
     canvas.setAttribute("width", 400);
     canvas.setAttribute("height", 400);
+    
   } else{
     canvas.setAttribute("width", div.style.width);
     canvas.setAttribute("height", div.style.width);
@@ -52,41 +51,45 @@ function init(){
   cols=context.canvas.width/lifesize;
   lives=new Array(rows * cols);
   lives2nd=new Array(rows * cols);
-  for(var i=0;i<lives.length;i++){
+  drawGrid();
+  for(var i=0;i<lives.length;i++)
     lives[i]=0;
-    lives2nd[i]=1;
-  }
-  draw();
+}
+
+function plus5(){
+  soup+=0.05;
+  if(soup>1) soup=1;
+  document.getElementById("random").innerHTML="Random Soup "+Math.round(soup*100)+"%";
+}
+
+function minus5(){
+  soup-=0.05;
+  if(soup<0) soup=0;
+  document.getElementById("random").innerHTML="Random Soup "+Math.round(soup*100)+"%";
 }
 
 function random(){
-  if(gamestarted==0){
-    soup=slider.getValue();
-    lives=new Array(rows * cols);
-    lives2nd=new Array(rows * cols);
-    for(var i=0;i<lives.length;i++){
-      if(Math.random()<soup){
-        lives[i]=1;
-        lives2nd[i]=0;
-      }else{
-        lives[i]=0;
-        lives2nd[i]=1;
-      }
-      
-    }
-    draw();
+  for(var i=0;i<lives.length;i++)
+    lives[i]=0;
+  for(var i=0;i<lives.length;i++){
+    if(Math.random()<soup)
+      lives[i]=1;
+    else
+      lives[i]=0;
   }
+  context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+  drawGrid();
+  drawlife();
+  
 }
 
 function mouseon(evt){
   mouse=1;
   setlives(evt);
 }
-
 function mouseup(){
   mouse=0;
 }
-
 function setlives(evt){
   if(gamestarted==0 && mouse==1){
      function getMousePos(canvas, evt) {
@@ -100,27 +103,28 @@ function setlives(evt){
       }
       var mousePos = getMousePos(canvas, evt);
       lives[mousePos.y*cols+mousePos.x]=1;
-      draw();
+      drawlife();
   }
 }
 
-function Start()
-{
+function Start(){
   if(gamestarted==0){
+    document.getElementById("random").disabled = true;
+    for(var i=0;i<lives.length;i++){
+      if(lives[i]==1) lives2nd[i]=0;
+      else lives2nd[i]=1;
+    }
     gamestarted=1;
-    gameoflife();
-    slider.disable();
+    drawlife();
+    timelp=setInterval(updatelife, speed);
   }
-}
-
-function gameoflife(){
-  updatelife(lifesize,lifesize,1,mapColor,lifeColor);
-  timelp=setInterval(updatelife, speed);
 }
 
 function updatelife(){
-  draw();
-  
+  context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+  drawGrid();
+  drawlife();
+
   gene+=1;
   var templive=new Array(lives.length);
   for(var i = 0; i<lives.length; i += 1)
@@ -141,7 +145,7 @@ function updatelife(){
         if(lifeCount==3&&templive[y2*cols+x2]==0)lives[y2*cols+x2]=1;
         }
   }
-  
+
   var diffgene=0;
   for(var i = 0; i<lives.length; i += 1)
     if(lives2nd[i]!=lives[i])
@@ -156,10 +160,7 @@ function updatelife(){
     lastgene50-=1;
 }
 
-function draw() {
-  var alive=0;
-  soup=slider.getValue();
-  context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+function drawGrid(){
   context.lineWidth = 1;
   context.strokeStyle = mapColor;
   for(var i = lifesize+0.5; i < context.canvas.height; i += lifesize){
@@ -168,14 +169,15 @@ function draw() {
       context.lineTo(context.canvas.width, i);
       context.stroke();
   }
-
   for(var i = lifesize+0.5; i < context.canvas.width; i += lifesize){
       context.beginPath();
       context.moveTo(i, 0);
       context.lineTo(i, context.canvas.height);
       context.stroke();
   }
-
+}
+function drawlife(){
+  var alive=0;
   context.fillStyle = lifeColor;
   for(var y=0;y<rows;y++){
       for(var x=0;x<cols;x++){
@@ -185,9 +187,9 @@ function draw() {
           }
       }
   }
-  document.getElementById("lifeinfo").innerHTML="Alive: "+alive+"&emsp;&emsp;Generation: "+gene+"&emsp; Random density:"+soup;
+  document.getElementById("lifeinfo").innerHTML="Alive: "+alive+"&emsp;&emsp;Generation: "+gene;
   if(lastgene50==0){
-    clearInterval(timelp);
+     clearInterval(timelp);
      document.getElementById("start").innerHTML="RESTART";
      document.getElementById("start").onclick=function(){window.location.reload();}
   }

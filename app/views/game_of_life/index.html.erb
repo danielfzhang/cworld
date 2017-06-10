@@ -21,7 +21,7 @@ const speed=50,//ms
       lifeColor='LightSeaGreen',
       mapColor='WhiteSmoke';
 var canvas,context,lives,lives2nd,cols,rows,div;
-var gamestarted=0,mouse=0,gene=0;//flag
+var gamestarted=0,mouse=0,gene=0,lastgene50=-1;//flag
 window.onload = init;
 
 function init(){
@@ -82,13 +82,12 @@ function Start()
   }
 }
 
-
 function gameoflife(){
   updatelife(lifesize,lifesize,1,mapColor,lifeColor);
   timelp=setInterval(updatelife, speed);
 }
 
-function updatelife() {
+function updatelife(){
   draw(1,mapColor,lifeColor);
   
   gene+=1;
@@ -112,20 +111,18 @@ function updatelife() {
         }
   }
   
-  
   var diffgene=0;
   for(var i = 0; i<lives.length; i += 1)
     if(lives2nd[i]!=lives[i])
       diffgene+=1;
-  if(diffgene==0){
-    clearInterval(timelp);
+  if(diffgene==0&&lastgene50==-1){
+    lastgene50=50;
     $("#gameover").show();
-  }else{
-    for(var i = 0; i<lives.length; i += 1)
-      lives2nd[i]=templive[i];
   }
-  
-   
+  for(var i = 0; i<lives.length; i += 1)
+    lives2nd[i]=templive[i];
+  if(lastgene50>0)
+    lastgene50-=1;
 }
 
 function draw(lineWidth, mapColor,lifeColor) {
@@ -157,5 +154,7 @@ function draw(lineWidth, mapColor,lifeColor) {
       }
   }
   document.getElementById("lifeinfo").innerHTML="Alive: "+alive+"&emsp;&emsp;Generation: "+gene;
+  if(lastgene50==0)
+    clearInterval(timelp);
 }
 </script>
